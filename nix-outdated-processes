@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+###
+#
+# Lists processes that are running from older generations of system or
+# user profile.
+#
+###
+
+# TODO: Terminology for naming variables must match NixOS' manual
+# TODO: Remove duplicate derivations (multiple processes from same derivation)
+# TODO: User profiles
+
+CURRENT_SYS_DRV_PATH=$(realpath /run/current-system)
+PS_OPTIONS=""
+
+while case "$1" in
+	  -a|--all) PS_OPTIONS+=-e
+		    shift
+		    ;;
+	  *) false
+	     ;;
+      esac
+do
+    true
+done
+
+ps $PS_OPTIONS -x -o pid=,euser=,comm= |\
+    sed 's, +, ,;s,^ ,,' |\
+    while read pid euser comm
+    do
+	CMD_RP="$(realpath /proc/${pid}/exe)"
+	test -e "${CMD_RP}" || continue
+	CMD_DRV_ROOTS=$(2>/dev/null \
+			 nix-store --query --roots "${CMD_RP}")
+	# skip up-to-date processes
+	[[ ${CMD_DRV_ROOTS} =~ (^|$'\n')/run/current-system($'\n'|$) ]] &&
+	    continue
+	# TODO: Calculate package that provides executable
+	echo ${comm} ${pid} ${CMD_DRV_ROOTS}
+    done

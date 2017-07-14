@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# TODO: User channels
+
+NIXOS_CHANNELS_DIR=/nix/var/nix/profiles/per-user/root/
+prev_gen=""
+
+{
+    echo "generation channel version"
+    find ${NIXOS_CHANNELS_DIR} -mindepth 1 -maxdepth 1 -iname "channels-*-link" \
+        | sort -t- -k2n \
+	| while read generation_path
+	  do
+	      generation=$(basename "${generation_path}" | cut -d- -f2)
+	      [ -n "${prev_gen}" -a "${prev_gen}" != "${generation}" ] && echo "-"
+	      prev_gen=generation
+	      find ${generation_path} -follow -mindepth 1 -maxdepth 1 \
+		   \( -name binary-caches -o -name manifest.nix \) -prune \
+		   -o -print \
+	      | while read channel_path
+	        do
+		    channel=$(basename ${channel_path})
+		    version=$(dirname $(realpath ${channel_path}) \
+				  | cut -d- -f2- | sed -r "s,${channel}-,,")
+		    echo $generation $channel $version
+	      done
+	done
+} | column -t

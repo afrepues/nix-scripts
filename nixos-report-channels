@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+NIXOS_LATEST_CHANNEL=/nix/var/nix/profiles/per-user/root/channels/nixos
+
+paste <(echo -e "booted\ncurrent\nchannel") \
+      <((realpath /run/{booted,current}-system
+	 dirname $(realpath ${NIXOS_LATEST_CHANNEL})) \
+	| cut -d- -f2- | sed -r "s,nixos-,,;s,system-$(hostname)-,,")
