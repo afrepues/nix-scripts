@@ -8,7 +8,7 @@ prev_gen=""
 {
     echo "generation channel version"
     find ${NIXOS_CHANNELS_DIR} -mindepth 1 -maxdepth 1 -iname "channels-*-link" \
-        | sort -t- -k2n \
+        | sort -t- -k3n \
 	| while read generation_path
 	  do
 	      generation=$(basename "${generation_path}" | cut -d- -f2)
