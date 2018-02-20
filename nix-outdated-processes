@@ -29,7 +29,7 @@ ps $PS_OPTIONS -x -o pid=,euser=,comm= |\
     sed 's, +, ,;s,^ ,,' |\
     while read pid euser comm
     do
-	CMD_RP="$(realpath /proc/${pid}/exe)"
+	CMD_RP="$(realpath -q /proc/${pid}/exe)"
 	test -e "${CMD_RP}" || continue
 	CMD_DRV_ROOTS=$(2>/dev/null \
 			 nix-store --query --roots "${CMD_RP}")
