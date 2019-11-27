@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# TODO: Use =configuration-name=
+
+NIXOS_SYSTEM_DIR=/nix/var/nix/profiles/
+
+{
+    echo "generation version date"
+    find ${NIXOS_SYSTEM_DIR} -mindepth 1 -maxdepth 1 -iname "system-*-link" \
+        | sort -t- -k3n \
+        | while read generation_path
+          do
+              generation=$(basename "${generation_path}" | cut -d- -f2)
+              version=$(cat "${generation_path}"/nixos-version)
+              birthday=$(stat --printf "%w\n%y\n" "${generation_path}" \
+                             | grep '^[0-9]' \
+                             | head -1
+                      )
+              birthday=$(date --rfc-3339=seconds --date="${birthday}")
+              echo $generation $version "${birthday}"
+          done
+} | column -t
