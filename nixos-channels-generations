@@ -26,7 +26,7 @@ current_gen=$(readlink -qn "${CHANNELS_DIR}"/channels | cut -d- -f2)
 	      else
 		  current_marker=' '
 	      fi
-	      [ -n "${prev_gen}" -a "${prev_gen}" != "${generation}" ] && echo "-"
+	      [ -n "${prev_gen}" -a "${prev_gen}" != "${generation}" ] && echo "  -"
 	      prev_gen=generation
 	      find ${generation_path} -follow -mindepth 1 -maxdepth 1 \
 		   \( -name binary-caches -o -name manifest.nix \) -prune \
@@ -36,7 +36,7 @@ current_gen=$(readlink -qn "${CHANNELS_DIR}"/channels | cut -d- -f2)
 		    channel=$(basename ${channel_path})
 		    version=$(dirname $(realpath ${channel_path}) \
 				  | cut -d- -f2- | sed -r "s,${channel}-,,")
-		    echo $current_marker $generation $channel $version
+		    echo "${current_marker} ${generation} ${channel} ${version}"
 	      done
 	done
 } | column -t
