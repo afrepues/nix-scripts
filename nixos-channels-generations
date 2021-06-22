@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 
-# TODO: User channels
-
-NIXOS_CHANNELS_DIR=/nix/var/nix/profiles/per-user/root/
+if [ "$(basename "$0")" = "nixos-channels-generations" ]
+then
+    CHANNELS_DIR=/nix/var/nix/profiles/per-user/root/
+elif [ "$(basename "$0")" = "nix-channels-generations" ]
+then
+    CHANNELS_DIR=/nix/var/nix/profiles/per-user/"${USER}"/
+else
+    echo Unsopported naming convention.
+    exit 1
+fi
 prev_gen=""
 
 {
     echo "generation channel version"
-    find ${NIXOS_CHANNELS_DIR} -mindepth 1 -maxdepth 1 -iname "channels-*-link" \
+    find ${CHANNELS_DIR} -mindepth 1 -maxdepth 1 -iname "channels-*-link" \
         | sort -t- -k3n \
 	| while read generation_path
 	  do
