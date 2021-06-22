@@ -11,14 +11,21 @@ else
     exit 1
 fi
 prev_gen=""
+current_gen=$(readlink -qn "${CHANNELS_DIR}"/channels | cut -d- -f2)
 
 {
-    echo "generation channel version"
+    echo "C generation channel version"
     find ${CHANNELS_DIR} -mindepth 1 -maxdepth 1 -iname "channels-*-link" \
         | sort -t- -k3n \
 	| while read generation_path
 	  do
 	      generation=$(basename "${generation_path}" | cut -d- -f2)
+	      if (( generation == current_gen ))
+	      then
+		  current_marker="*"
+	      else
+		  current_marker=" "
+	      fi
 	      [ -n "${prev_gen}" -a "${prev_gen}" != "${generation}" ] && echo "-"
 	      prev_gen=generation
 	      find ${generation_path} -follow -mindepth 1 -maxdepth 1 \
@@ -29,7 +36,7 @@ prev_gen=""
 		    channel=$(basename ${channel_path})
 		    version=$(dirname $(realpath ${channel_path}) \
 				  | cut -d- -f2- | sed -r "s,${channel}-,,")
-		    echo $generation $channel $version
+		    echo $current_marker $generation $channel $version
 	      done
 	done
 } | column -t
