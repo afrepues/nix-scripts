@@ -22,9 +22,9 @@ current_gen=$(readlink -qn "${CHANNELS_DIR}"/channels | cut -d- -f2)
 	      generation=$(basename "${generation_path}" | cut -d- -f2)
 	      if (( generation == current_gen ))
 	      then
-		  current_marker="*"
+		  current_marker='*'
 	      else
-		  current_marker=" "
+		  current_marker=' '
 	      fi
 	      [ -n "${prev_gen}" -a "${prev_gen}" != "${generation}" ] && echo "-"
 	      prev_gen=generation
